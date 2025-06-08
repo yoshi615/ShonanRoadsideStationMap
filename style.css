@@ -18,15 +18,15 @@
         background: white;
         box-sizing: border-box;
         z-index: 2;
-        transition: margin-left 0.3s ease-in-out;
+        /* transition: margin-left 0.3s ease-in-out; */ /* ← アニメーションをコメントアウト */
         background-color: rgba(41,100,96,0.2);
     }
-    #left-panel.closed {
-        margin-left: calc(-30% + -27px);
-    }
-    #left-panel.closed + #right-panel {
-        width: 100%;
-    }
+    /* #left-panel.closed {
+        /* margin-left: calc(-30% + -27px); */ /* ← 非表示をコメントアウト
+    } */
+    /* #left-panel.closed + #right-panel {
+        /* width: 100%; */ /* ← 非表示時の右パネル拡大をコメントアウト
+    } */
     #panel-handle {
         position: absolute;
         right: -32px;
@@ -75,7 +75,8 @@
     }
     #map-tools {
         position: absolute;
-        top: 50px;
+        width: 65px;
+        top: 60px;
         right: 10px;
         transform: translateX(120%);
         transition: transform 0.3s ease-in-out;
@@ -170,28 +171,22 @@
         bottom: 0;
         background: rgba(41, 100, 96, 0.2);
         z-index: 2;
-        transition: transform 0.3s ease-in-out;
+        transition: transform 0.3s ease-in-out; /* ← スマホ用のみアニメーション有効 */
         background-color: rgba(41, 100, 96, 0.2);
         overflow-y: auto;
-        transform: translateY(100%); /* Start hidden */
+        transform: translateY(100%); /* ← スマホ用のみアニメーション有効 */
         padding: 20px;
         box-sizing: border-box;
     }
     #left-panel.closed {
-        transform: translateY(100%);
+        transform: translateY(100%); /* ← スマホ用のみアニメーション有効 */
     }
     #left-panel:not(.closed) {
-        transform: translateY(0); /* Show panel when not closed */
-    }
-    #left-panel:not(.closed) + #right-panel {
-        height: 50vh;
-    }
-    #left-panel:not(.closed) + #right-panel #map {
-        height: 50vh;
+        transform: translateY(0); /* ← スマホ用のみアニメーション有効 */
     }
     #panel-handle {
-        position: fixed; /* Change to fixed */
-        bottom: 46vh; /* Position at the middle of the viewport */
+        position: fixed;
+        bottom: 46vh;
         left: 50%;
         transform: translateX(-50%);
         width: 60px;
@@ -206,10 +201,10 @@
         border-radius: 0 0 0 0;
         box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
         z-index: 1000;
-        transition: bottom 0.3s ease-in-out;
+        transition: bottom 0.3s ease-in-out; /* ← スマホ用のみアニメーション有効 */
     }
     #left-panel.closed #panel-handle {
-        bottom: 0; /* Move handle to bottom when panel is closed */
+        bottom: 0; /* ← スマホ用のみアニメーション有効 */
     }
     .handle-icon {
         color: #296460;
@@ -224,14 +219,14 @@
     #right-panel {
         width: 100%;
         height: 100vh; /* Default to full height */
-        transition: height 0.3s ease-in-out;
+        /* transition: height 0.3s ease-in-out; */ /* ← アニメーションをコメントアウト */
         position: relative;
         flex-shrink: 0; /* Prevent panel from shrinking */
     }
     #map {
         height: 100vh; /* Default to full height */
         width: 100%;
-        transition: height 0.3s ease-in-out;
+        /* transition: height 0.3s ease-in-out; */ /* ← アニメーションをコメントアウト */
     }
     #map-style {
         display: none;
@@ -241,7 +236,7 @@
     }
     #map-tools {
         position: absolute;
-        top: 50px;
+        top: 60px;
         /* top: auto; */
         right: 10px;
         z-index: 9999;
@@ -305,14 +300,14 @@
     @keyframes fade { from {opacity: .4} to {opacity: 1} }
     
     /* Add this new style for when panel is open */
-    body.panel-open {
-        height: 100vh;
-        overflow: hidden;
+    /* body.panel-open {
+        /* height: 100vh; */
+        /* overflow: hidden;
     }
-    body.panel-open #right-panel,
+    /* body.panel-open #right-panel,
     body.panel-open #map {
-        height: 50vh;
-    }
+        /* height: 50vh;
+    } */
 }
 
 /* Replace all switch styles with these new ones */
@@ -518,19 +513,24 @@ input:checked + .lang-slider .ja,
     top: 10px;
     right: 10px;
     z-index: 10000;
-    background: #296460; /* replaced #296460 */
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
+    background: none;         /* 背景色を消す */
+    color: inherit;
+    border: none;             /* 枠線を消す */
+    padding: 0;               /* パディングを消す */
+    border-radius: 0;         /* 角丸を消す */
     cursor: pointer;
     font-size: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    transition: background-color 0.3s;
+    box-shadow: none;         /* 影を消す */
+    transition: none;
+    width: 32px;              /* ボタンサイズを画像に合わせる */
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tools-toggle:hover {
-    background-color: #163900; /* replaced #darkcodebase */
+    background: none;         /* ホバー時も背景なし */
 }
 
 .control-row {

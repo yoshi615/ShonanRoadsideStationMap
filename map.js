@@ -5,38 +5,56 @@ function init() {
 	
 	let lastClickedMarker = null; // 最後にクリックしたマーカーを追跡
 	// 言語切り替え設定
-	 let currentLanguage = 'japanese'; // 初期言語
+	 let currentLanguage = 'japanese';
+	let rows = data.main.values;
+	// ...existing code...
+
 	function setLanguage(language) {
 		currentLanguage = language;
-		regenerateLeftPanel(); // 左パネルを再生成
+		renderShonanInfo(); // 言語切り替え時も再描画
 	}
 
-	function updateTextContent() { // ここを追加
-		const elements = document.querySelectorAll('[data-japanese], [data-english]');
-		elements.forEach(element => {
-			if (currentLanguage === 'japanese') {
-				element.textContent = element.getAttribute('data-japanese');
-			} else {
-				element.textContent = element.getAttribute('data-english');
-			}
-		});
-	}
-
-	// Replace language button event listener with toggle
 	document.getElementById('languageToggle').addEventListener('change', function(e) {
 		const newLanguage = e.target.checked ? 'english' : 'japanese';
-		// Update all translatable elements
 		document.querySelectorAll('[data-ja], [data-en]').forEach(element => {
 			element.textContent = element.getAttribute(newLanguage === 'english' ? 'data-en' : 'data-ja');
 		});
 		setLanguage(newLanguage);
-		
-		// Update tools button text
-		const isVisible = mapTools.classList.contains('visible');
-		toolsToggle.textContent = newLanguage === 'english' 
-			? (isVisible ? 'Tools' : 'Show Tools')
-			: (isVisible ? 'ツール' : 'ツールを表示');
 	});
+
+	// 「道の駅しょうなん」の情報のみを表示
+	function renderShonanInfo() {
+		const info = document.getElementById('info');
+		const shonanRow = rows.find(row =>
+			(row[2] && row[2].includes('道の駅しょうなん')) ||
+			(row[3] && row[3].toLowerCase().includes('shonan'))
+		);
+		if (!shonanRow) {
+			info.innerHTML = 'unable to find "道の駅しょうなん" information';
+			return;
+		}
+		// CSV列: id,category,jName,eName,lat,lon,SiteLink,SiteLinkname,english-SiteLink,InstagramLink,InstagramLinkname,english-InstagramLinkname,FacebookLink,FacebookLinkname,english-FacebookLinkname,XLink,XLinkname,english-XLinkname
+		const [
+			id, category, jName, eName, lat, lon,
+			SiteLink, SiteLinkname, englishSiteLinkname,
+			InstagramLink, InstagramLinkname, englishInstagramLinkname,
+			FacebookLink, FacebookLinkname, englishFacebookLinkname,
+			XLink, XLinkname, englishXLinkname
+		] = shonanRow;
+		const name = currentLanguage === 'japanese' ? jName : eName;
+		const siteLabel = currentLanguage === 'japanese' ? SiteLinkname : englishSiteLinkname;
+		const instaLabel = currentLanguage === 'japanese' ? InstagramLinkname : englishInstagramLinkname;
+		const fbLabel = currentLanguage === 'japanese' ? FacebookLinkname : englishFacebookLinkname;
+		const xLabel = currentLanguage === 'japanese' ? XLinkname : englishXLinkname;
+		info.innerHTML = `
+			<h2>${name}</h2>
+			${InstagramLink ? `<a href="${InstagramLink}" target="_blank" class="info-link">${instaLabel}</a><br>` : ''}
+			${FacebookLink ? `<a href="${FacebookLink}" target="_blank" class="info-link">${fbLabel}</a><br>` : ''}
+			${XLink ? `<a href="${XLink}" target="_blank" class="info-link">${xLabel}</a><br>` : ''}
+			${SiteLink ? `<a href="${SiteLink}" target="_blank" class="info-link">${siteLabel}</a>` : ''}
+			${SiteLink ? `<iframe src="${SiteLink}" width="100%" height="400" style="border:none; background:white;"></iframe>` : ''}
+		`;
+	}
 
 	// 初期メッセージを設定
 	  document.getElementById('info').innerHTML = '言語の選択とアイコンをクリックまたはタップして詳細を表示';
@@ -50,7 +68,6 @@ function init() {
 	let lonSum = 0;
 
 	// データを取得
-	let rows = data.main.values;
 	let markers = [];
 	initMap();
 
@@ -132,7 +149,7 @@ function init() {
 
 		// マーカーをマップに追加
 		rows.forEach((row, index) => {
-			const [id, category, jName, eName, lat, lon, SiteLink, SiteLinkname, InstagramLink, InstagramLinkname, FacebookLink, FacebookLinkname] = row;
+			const [id, category, jName, eName, lat, lon, SiteLink, SiteLinkname, InstagramLink, InstagramLinkname, FacebookLink, FacebookLinkname, XLink, XLinkname] = row;
 
 			const markerConfig = {
 				0: { image: `reitaku-${id}-1.jpg`, size: '40px', radius: '50%', zIndex: '1000' }
@@ -162,50 +179,17 @@ function init() {
 			markers.push(marker);
 			customMarker.title = currentLanguage === 'japanese' ? jName : eName;
 
+			// マーカークリック時にスマホレイアウトならleft-panelを表示
 			marker.getElement().addEventListener('click', () => {
-				// If same marker is clicked again, do nothing
-				if (lastClickedMarker === marker) {
-					document.getElementById('info').innerHTML = 'マーカーをクリックまたはタップして詳細を表示';
-					lastClickedMarker = null;
-				} else {					
-					document.getElementById('info').innerHTML = `
-						<h2>${currentLanguage === 'japanese' ? jName : eName}</h2>
-						<a href="${InstagramLink}" target="_blank" class="info-link">${InstagramLinkname}</a><br>
-						<a href="${FacebookLink}" target="_blank" class="info-link">${FacebookLinkname}</a><br>
-						<a href="${SiteLink}" target="_blank" class="info-link">${SiteLinkname}</a>
-						<iframe src="${SiteLink}" width="100%" height="400" style="border:none; background:white;"></iframe>
-				`;
-					lastClickedMarker = marker;
-				}
-
-				currentMarkerId = id;
 				const leftPanel = document.getElementById('left-panel');
-				const mapElement = document.getElementById('map');				
-
-				
-				// Remove closed class to show panel
-				leftPanel.classList.remove('closed');
-				document.body.classList.add('panel-open');
-				
-				// Adjust map height for mobile
 				if (window.innerWidth <= 767) {
-					setTimeout(() => {
-						map.resize();
-					}, 300);
+					leftPanel.classList.remove('closed');
 				}
-				
-				document.getElementById('info').innerHTML = `
-					<h2>${currentLanguage === 'japanese' ? jName : eName}</h2>
-					<a href="${InstagramLink}" target="_blank" class="info-link">${InstagramLinkname}</a><br>
-					<a href="${FacebookLink}" target="_blank" class="info-link">${FacebookLinkname}</a><br>
-					<a href="${SiteLink}" target="_blank" class="info-link">${SiteLinkname}</a>
-					<iframe src="${SiteLink}" width="100%" height="400" style="border:none; background:white;"></iframe>
-				`;
-				lastClickedMarker = marker;
 			});
 		});
 
-		
+		// 初期表示
+		renderShonanInfo();
 	}
 	// create a function that regenerates the left panel based on the current marker id
 	function regenerateLeftPanel() {
@@ -213,13 +197,14 @@ function init() {
 		const row = rows.find(row => row[0] === currentMarkerId);
 		if (!row) return; // if no row is found, exit the function
 
-		const [id, category, jName, eName, lat, lon, SiteLink, SiteLinkname, InstagramLink, InstagramLinkname, FacebookLink, FacebookLinkname] = row;
+		const [id, category, jName, eName, lat, lon, SiteLink, SiteLinkname, InstagramLink, InstagramLinkname, FacebookLink, FacebookLinkname, XLink, XLinkname] = row;
 
 		const name = currentLanguage === 'japanese' ? jName : eName;
 		document.getElementById('info').innerHTML = `
 			<h2>${name}</h2>
 			<a href="${InstagramLink}" target="_blank" class="info-link">${InstagramLinkname}</a><br>
 			<a href="${FacebookLink}" target="_blank" class="info-link">${FacebookLinkname}</a><br>
+			<a href="${XLink}" target="_blank" class="info-link">${XLinkname}</a><br>
 			<a href="${SiteLink}" target="_blank" class="info-link">${SiteLinkname}</a>
 			<iframe src="${SiteLink}" width="100%" height="400" style="border:none; background:white;"></iframe>
 		`;
@@ -230,14 +215,12 @@ function init() {
 	const panelHandle = document.getElementById('panel-handle');
 
 	panelHandle.addEventListener('click', () => {
-		leftPanel.classList.toggle('closed');
-		document.body.classList.toggle('panel-open');
-		
 		if (window.innerWidth <= 767) {
-			setTimeout(() => {
-				map.resize();
-			}, 300);
+			leftPanel.classList.add('closed'); // ← 追加: スマホ時は閉じる
 		}
+		setTimeout(() => {
+			map.resize();
+		}, 300);
 	});
 
 	// Add tools panel toggle functionality
@@ -247,9 +230,6 @@ function init() {
 	toolsToggle.addEventListener('click', () => {
 		const isVisible = mapTools.classList.contains('visible');
 		mapTools.classList.toggle('visible');
-		toolsToggle.textContent = currentLanguage === 'japanese' 
-			? (isVisible ? '地図オプションを表示' : '地図オプションを非表示')
-			: (isVisible ? 'Show map options' : 'Hide map options');
 	});
 
 }
