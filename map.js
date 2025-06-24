@@ -432,10 +432,18 @@ function init() {
 
 }
 
-// 現在地を取得してcp_blue2.pngで表示
+// 現在地を取得してcp_blue2.pngで表示（ライブ追従対応）
 function showCurrentLocation() {
 	if (!navigator.geolocation) return;
-	navigator.geolocation.getCurrentPosition(function(pos) {
+
+	// 既存のwatcherがあれば停止
+	if (map._currentLocationWatcherId) {
+		navigator.geolocation.clearWatch(map._currentLocationWatcherId);
+		map._currentLocationWatcherId = null;
+	}
+
+	// 位置情報を監視
+	map._currentLocationWatcherId = navigator.geolocation.watchPosition(function(pos) {
 		const lng = pos.coords.longitude;
 		const lat = pos.coords.latitude;
 
@@ -457,5 +465,11 @@ function showCurrentLocation() {
 			.addTo(map);
 
 		map._currentLocationMarker = marker;
+	}, function(error) {
+		// エラー時は何もしない
+	}, {
+		enableHighAccuracy: true,
+		maximumAge: 0,
+		timeout: 10000
 	});
 }
