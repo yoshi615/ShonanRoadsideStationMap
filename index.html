@@ -30,6 +30,22 @@
 				<img src="images/facebook_logo.png" alt="Facebook">
 			</button>
 		</div>
+		<button id="show-routes-btn">ルートを表示</button>
+		<div id="routes-toggle-panel" style="display:none;position:absolute;top:64px;left:10px;z-index:10003;background:#fff;padding:18px 20px 12px 20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+			<div style="font-weight:bold;margin-bottom:10px;">ルート表示</div>
+			<label class="switch-route">
+				<input type="checkbox" id="route-switch-0">
+				<span class="slider"></span>
+				<span class="route-label">てんと棟 <==> 食堂</span>
+			</label>
+			<br>
+			<label class="switch-route">
+				<input type="checkbox" id="route-switch-1">
+				<span class="slider"></span>
+				<span class="route-label">てんと棟 <==> つばさ棟</span>
+			</label>
+			<!-- 必要に応じてルートを追加 -->
+		</div>
 		<div id="map"></div>
 	</div>
 	<script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>

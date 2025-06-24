@@ -10,7 +10,6 @@ function init() {
 	// 言語切り替え設定
 	 let currentLanguage = 'japanese';
 	let rows = data.main.values;
-	// ...existing code...
 
 	function setLanguage(language) {
 		currentLanguage = language;
@@ -77,6 +76,8 @@ function init() {
 	// current marker idの変数
 	let currentMarkerId = null;
 
+	let routesDrawn = false; // ルート表示状態
+
 	function initMap(preservePosition = false) {
 		// Calculate initial center coordinates regardless of preservePosition
 		latSum = 0;
@@ -117,11 +118,12 @@ function init() {
 			map = new maplibregl.Map({
 				container: 'map',
 				style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-				center: [137.726, 36.2048], // 日本の中心付近
-				zoom: 4, // 日本全体が見えるズーム
-				pitchWithRotate: true, // ピッチ変更を有効化
-				touchPitch: true,       // 2本指上下でピッチ変更を有効化
-				touchZoomRotate: true   // 2本指ピンチズーム・回転を有効化
+				center: [137.726, 36.2048],
+				zoom: 4,
+				pitchWithRotate: true,
+				touchPitch: true,
+				touchZoomRotate: true,
+				pitch: 0 // ← 初期値は0、後でflyToで変更
 			});
 			map.on('style.load', () => {
 				setTimeout(() => {
@@ -130,9 +132,12 @@ function init() {
 						zoom: 18,
 						speed: 0.8,
 						curve: 1.5,
-						essential: true
+						essential: true,
+						pitch: 60 // ← ここで傾きを加える（例: 60度）
 					});
-				}, 1000); // 1秒後に拡大開始
+					// 線は最初は表示しない
+					// drawCustomLines(); ← 削除
+				}, 1000);
 			});
 		} else {
 			map.flyTo({
@@ -140,8 +145,10 @@ function init() {
 				zoom: 18,
 				speed: 0.8,
 				curve: 1.5,
-				essential: true
+				essential: true,
+				pitch: 60 // ← ここでも傾きを加える
 			});
+			// drawCustomLines(); ← 削除
 		}
 
 		// Restore previous view if preserving position
@@ -149,6 +156,136 @@ function init() {
 			map.setCenter(currentCenter);
 			map.setZoom(currentZoom);
 		}
+	}
+
+	// 複数の線を描画する関数
+	function drawCustomLines() {
+		// 複数のLineString座標配列
+		const lines = [
+			[
+				[140.02247036374916,35.857351475012855],
+				[140.02249263591895,35.85734696883766],
+				[140.0229420793391,35.85764094599428],
+				[140.02314815712387,35.85775912092171]
+			],
+			[
+				[140.02247036374916,35.857351475012855],
+				[140.02249263591895,35.85734696883766],
+				[140.0229420793391,35.85764094599428],
+				[140.02298434465897,35.857605347669946],
+				[140.02307848872718,35.85759777135079],
+				[140.02326252210872,35.857550232721074],
+				[140.0232989863063,35.8576449377277]
+			],
+			// 必要なだけ追加
+		];
+
+		const colors = [
+			'#b3b3ff', '#ffb84d', '#4db3ff', '#4dffe1', '#4dff4d', '#ffe14d', '#ff85ff'
+		];
+
+		// 既存の線をすべて削除
+		lines.forEach((_, idx) => {
+			const id = `custom-line-${idx}`;
+			if (map.getLayer(id)) map.removeLayer(id);
+			if (map.getSource(id)) map.removeSource(id);
+			const popupId = `custom-line-popup-${idx}`;
+			if (map._customLinePopups && map._customLinePopups[popupId]) {
+				map._customLinePopups[popupId].remove();
+				delete map._customLinePopups[popupId];
+			}
+		});
+
+		if (!map._customLinePopups) map._customLinePopups = {};
+
+		// 各線を追加
+		lines.forEach((coords, idx) => {
+			const id = `custom-line-${idx}`;
+			map.addSource(id, {
+				'type': 'geojson',
+				'data': {
+					'type': 'Feature',
+					'geometry': {
+						'type': 'LineString',
+						'coordinates': coords
+					}
+				}
+			});
+			map.addLayer({
+				'id': id,
+				'type': 'line',
+				'source': id,
+				'layout': {
+					'line-join': 'round',
+					'line-cap': 'round'
+				},
+				'paint': {
+					'line-color': colors[idx % colors.length],
+					'line-width': 5
+				}
+			});
+
+			// 距離計算
+			const distanceMeters = calcLineLength(coords);
+			const walkMin = Math.round(distanceMeters / 80); // 徒歩80m/分で計算
+			const walkText = `徒歩約${walkMin}分 (${distanceMeters < 1000 ? distanceMeters.toFixed(0) + 'm' : (distanceMeters/1000).toFixed(2) + 'km'})`;
+
+			// 線の中間点を計算
+			const midCoord = getLineMidpoint(coords);
+
+			// ポップアップ生成
+			const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false })
+				.setLngLat(midCoord)
+				.setHTML(`<div style="font-size:14px;font-weight:bold;">${walkText}</div>`)
+				.addTo(map);
+
+			// 管理しておく（再描画時に消すため）
+			map._customLinePopups[`custom-line-popup-${idx}`] = popup;
+		});
+	}
+
+	// 2点間の距離（m）を計算（Haversine式）
+	function calcDistance(lat1, lon1, lat2, lon2) {
+		const R = 6371000; // 地球半径(m)
+		const toRad = x => x * Math.PI / 180;
+		const dLat = toRad(lat2 - lat1);
+		const dLon = toRad(lon2 - lon1);
+		const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+			Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+			Math.sin(dLon/2) * Math.sin(dLon/2);
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		return R * c;
+	}
+
+	// 線分全体の長さ（m）を計算
+	function calcLineLength(coords) {
+		let sum = 0;
+		for (let i = 1; i < coords.length; i++) {
+			const [lon1, lat1] = coords[i-1];
+			const [lon2, lat2] = coords[i];
+			sum += calcDistance(lat1, lon1, lat2, lon2);
+		}
+		return sum;
+	}
+
+	// 線分の中間点（全長の50%地点）を返す
+	function getLineMidpoint(coords) {
+		const total = calcLineLength(coords);
+		let acc = 0;
+		for (let i = 1; i < coords.length; i++) {
+			const [lon1, lat1] = coords[i-1];
+			const [lon2, lat2] = coords[i];
+			const seg = calcDistance(lat1, lon1, lat2, lon2);
+			if (acc + seg >= total/2) {
+				const ratio = (total/2 - acc) / seg;
+				const lat = lat1 + (lat2 - lat1) * ratio;
+				const lon = lon1 + (lon2 - lon1) * ratio;
+				return [lon, lat];
+			}
+			acc += seg;
+		}
+		// fallback: 最初の点
+		return coords[0];
 	}
 
 	// setupSNSButtonsを必ず呼び出す
@@ -163,5 +300,132 @@ function init() {
 			mapTools.classList.toggle('visible');
 		});
 	}
+
+	// ルート線データ
+	const lines = [
+		[
+			[140.02247036374916,35.857351475012855],
+			[140.02249263591895,35.85734696883766],
+			[140.0229420793391,35.85764094599428],
+			[140.02314815712387,35.85775912092171]
+		],
+		[
+			[140.02247036374916,35.857351475012855],
+			[140.02249263591895,35.85734696883766],
+			[140.0229420793391,35.85764094599428],
+			[140.02298434465897,35.857605347669946],
+			[140.02307848872718,35.85759777135079],
+			[140.02326252210872,35.857550232721074],
+			[140.0232989863063,35.8576449377277]
+		]
+		// 必要に応じて追加
+	];
+	const colors = [
+		'#b3b3ff', '#ffb84d', '#4db3ff', '#4dffe1', '#4dff4d', '#ffe14d', '#ff85ff'
+	];
+
+	// 線とポップアップを全て非表示にする関数
+	function hideCustomLines() {
+		lines.forEach((_, idx) => {
+			const id = `custom-line-${idx}`;
+			if (map.getLayer(id)) map.removeLayer(id);
+			if (map.getSource(id)) map.removeSource(id);
+			const popupId = `custom-line-popup-${idx}`;
+			if (map._customLinePopups && map._customLinePopups[popupId]) {
+				map._customLinePopups[popupId].remove();
+				delete map._customLinePopups[popupId];
+			}
+		});
+	}
+
+	// 指定した線のみ表示
+	function showCustomLine(idx) {
+		const coords = lines[idx];
+		const id = `custom-line-${idx}`;
+		const color = colors[idx % colors.length];
+
+		// 既存を消してから追加
+		if (map.getLayer(id)) map.removeLayer(id);
+		if (map.getSource(id)) map.removeSource(id);
+		const popupId = `custom-line-popup-${idx}`;
+		if (map._customLinePopups && map._customLinePopups[popupId]) {
+			map._customLinePopups[popupId].remove();
+			delete map._customLinePopups[popupId];
+		}
+		if (!map._customLinePopups) map._customLinePopups = {};
+
+		map.addSource(id, {
+			'type': 'geojson',
+			'data': {
+				'type': 'Feature',
+				'geometry': {
+					'type': 'LineString',
+					'coordinates': coords
+				}
+			}
+		});
+		map.addLayer({
+			'id': id,
+			'type': 'line',
+			'source': id,
+			'layout': {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			'paint': {
+				'line-color': color,
+				'line-width': 5
+			}
+		});
+
+		const distanceMeters = calcLineLength(coords);
+		const walkMin = Math.round(distanceMeters / 80);
+		const walkText = `徒歩約${walkMin}分 (${distanceMeters < 1000 ? distanceMeters.toFixed(0) + 'm' : (distanceMeters/1000).toFixed(2) + 'km'})`;
+		const midCoord = getLineMidpoint(coords);
+
+		const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false })
+			.setLngLat(midCoord)
+			.setHTML(`<div style="font-size:14px;font-weight:bold;">${walkText}</div>`)
+			.addTo(map);
+
+		map._customLinePopups[popupId] = popup;
+	}
+
+	// 指定した線のみ非表示
+	function hideCustomLine(idx) {
+		const id = `custom-line-${idx}`;
+		if (map.getLayer(id)) map.removeLayer(id);
+		if (map.getSource(id)) map.removeSource(id);
+		const popupId = `custom-line-popup-${idx}`;
+		if (map._customLinePopups && map._customLinePopups[popupId]) {
+			map._customLinePopups[popupId].remove();
+			delete map._customLinePopups[popupId];
+		}
+	}
+
+	// ルート表示ボタンのイベント
+	const showRoutesBtn = document.getElementById('show-routes-btn');
+	const routesTogglePanel = document.getElementById('routes-toggle-panel');
+	if (showRoutesBtn && routesTogglePanel) {
+		showRoutesBtn.addEventListener('click', () => {
+			const isVisible = routesTogglePanel.style.display === "block";
+			routesTogglePanel.style.display = isVisible ? "none" : "block";
+		});
+	}
+
+	// 各スイッチのイベント
+	lines.forEach((_, idx) => {
+		const switchEl = document.getElementById(`route-switch-${idx}`);
+		if (switchEl) {
+			switchEl.checked = false; // 初期は非表示
+			switchEl.addEventListener('change', function() {
+				if (switchEl.checked) {
+					showCustomLine(idx);
+				} else {
+					hideCustomLine(idx);
+				}
+			});
+		}
+	});
 
 }

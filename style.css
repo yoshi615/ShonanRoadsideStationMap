@@ -74,100 +74,120 @@
     }
     @keyframes fade { from {opacity: .4} to {opacity: 1} }
 
-    /* --- X(Twitter)ボタン --- */
-    #btn-x-wrapper {
+    /* --- SNSボタン --- */
+    #btn-x-wrapper, #btn-instagram-wrapper, #btn-home-wrapper, #btn-facebook-wrapper {
         position: absolute;
-        top: 7px;
         right: 1px;
         z-index: 10001;
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    #btn-x {
+    #btn-x-wrapper { top: 7px; }
+    #btn-instagram-wrapper { top: 57px; }
+    #btn-home-wrapper { top: 109px; }
+    #btn-facebook-wrapper { top: 164px; }
+
+    #btn-x, #btn-instagram, #btn-home, #btn-facebook {
         background: none;
         border: none;
         padding: 0;
         cursor: pointer;
         outline: none;
         transition: transform 0.2s, filter 0.2s;
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    #btn-x:hover {
+    #btn-x:hover, #btn-instagram:hover, #btn-home:hover, #btn-facebook:hover {
         transform: scale(1.15);
     }
-    #btn-x img {
+    #btn-x img,
+    #btn-instagram img,
+    #btn-home img,
+    #btn-facebook img {
         width: 46px;
         height: 46px;
         display: block;
+        margin: auto;
+        /* アイコンの中心揃え */
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
-    /* --- Instagramボタン --- */
-    #btn-instagram-wrapper {
+    /* ルート表示ボタン */
+    #show-routes-btn {
         position: absolute;
-        top: 57px;
-        right: 1px;
-        z-index: 10001;
-    }
-    #btn-instagram {
-        background: none;
+        top: 8px;
+        left: 4px;
+        z-index: 10002;
+        background-color: #4de7ff;
+        color: #333;
         border: none;
-        padding: 0;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: bold;
         cursor: pointer;
-        outline: none;
-        transition: transform 0.2s, filter 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: background 0.2s, transform 0.2s;
     }
-    #btn-instagram:hover {
-        transform: scale(1.15);
-    }
-    #btn-instagram img {
-        width: 50px;
-        height: 50px;
-        display: block;
+    #show-routes-btn:hover {
+        background-color: #a1fff9;
+        transform: scale(1.07);
     }
 
-    /* --- ホームページボタン --- */
-    #btn-home-wrapper {
-        position: absolute;
-        top: 109px;
-        right: 1px;
-        z-index: 10001;
+    #routes-toggle-panel {
+        min-width: 180px;
+        /* 他はインラインstyleでOK */
     }
-    #btn-home {
-        background: none;
-        border: none;
-        padding: 0;
+    .switch-route {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
         cursor: pointer;
-        outline: none;
-        transition: transform 0.2s, filter 0.2s;
+        user-select: none;
     }
-    #btn-home:hover {
-        transform: scale(1.15);
+    .switch-route input[type="checkbox"] {
+        display: none;
     }
-    #btn-home img {
-        width: 50px;
-        height: 50px;
-        display: block;
+    .switch-route .slider {
+        width: 44px;
+        height: 24px;
+        background: #ccc;
+        border-radius: 24px;
+        position: relative;
+        transition: background 0.2s;
+        margin-right: 12px;
     }
-
-    /* --- Facebookボタン --- */
-    #btn-facebook-wrapper {
+    .switch-route .slider:before {
+        content: "";
         position: absolute;
-        top: 164px;
-        right: 1px;
-        z-index: 10001;
+        left: 2px;
+        top: 2px;
+        width: 20px;
+        height: 20px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform 0.2s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    #btn-facebook {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        outline: none;
-        transition: transform 0.2s, filter 0.2s;
+    .switch-route input[type="checkbox"]:checked + .slider {
+        background: #4de7ff;
     }
-    #btn-facebook:hover {
-        transform: scale(1.15);
+    .switch-route input[type="checkbox"]:checked + .slider:before {
+        transform: translateX(20px);
     }
-    #btn-facebook img {
-        width: 50px;
-        height: 50px;
-        display: block;
+    .route-label {
+        font-size: 15px;
+        color: #333;
+        margin-left: 4px;
     }
 }
 
