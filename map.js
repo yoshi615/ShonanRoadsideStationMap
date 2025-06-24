@@ -7,13 +7,12 @@ function init() {
 	}
 	
 	let lastClickedMarker = null; // 最後にクリックしたマーカーを追跡
-	// 言語切り替え設定
-	 let currentLanguage = 'japanese';
+	let currentLanguage = 'japanese';
 	let rows = data.main.values;
 
 	function setLanguage(language) {
 		currentLanguage = language;
-		renderShonanInfo(); // 言語切り替え時も再描画
+		renderShonanInfo();
 	}
 
 	// 言語切り替えトグルが存在する場合のみイベントを設定
@@ -41,11 +40,11 @@ function init() {
 		);
 		if (!shonanRow) return;
 		const [
-			id, category, jName, eName, lat, lon,
-			SiteLink, SiteLinkname, englishSiteLinkname,
-			InstagramLink, InstagramLinkname, englishInstagramLinkname,
-			FacebookLink, FacebookLinkname, englishFacebookLinkname,
-			XLink, XLinkname, englishXLinkname
+			, , , , , ,
+			SiteLink, , ,
+			InstagramLink, , ,
+			FacebookLink, , ,
+			XLink
 		] = shonanRow;
 
 		// X(Twitter)ボタン
@@ -76,23 +75,20 @@ function init() {
 	// current marker idの変数
 	let currentMarkerId = null;
 
-	let routesDrawn = false; // ルート表示状態
-
 	function initMap(preservePosition = false) {
 		// Calculate initial center coordinates regardless of preservePosition
 		latSum = 0;
 		lonSum = 0;
 		let validPoints = 0;
-
 		let bounds = new maplibregl.LngLatBounds();
 
 		rows.forEach(row => {
 			const [, , , , lat, lon] = row;
 			if (lat && lon) {
-			latSum += parseFloat(lat);
-			lonSum += parseFloat(lon);
-			validPoints++;
-			bounds.extend([parseFloat(lon), parseFloat(lat)]);
+				latSum += parseFloat(lat);
+				lonSum += parseFloat(lon);
+				validPoints++;
+				bounds.extend([parseFloat(lon), parseFloat(lat)]);
 			}
 		});
 
@@ -136,7 +132,6 @@ function init() {
 						pitch: 60 // ← ここで傾きを加える（例: 60度）
 					});
 					// 線は最初は表示しない
-					// drawCustomLines(); ← 削除
 					showCurrentLocation(); // 位置情報取得＆表示
 				}, 1000);
 			});
@@ -149,7 +144,6 @@ function init() {
 				essential: true,
 				pitch: 60 // ← ここでも傾きを加える
 			});
-			// drawCustomLines(); ← 削除
 			showCurrentLocation(); // 位置情報取得＆表示
 		}
 
@@ -158,92 +152,6 @@ function init() {
 			map.setCenter(currentCenter);
 			map.setZoom(currentZoom);
 		}
-	}
-
-	// 複数の線を描画する関数
-	function drawCustomLines() {
-		// 複数のLineString座標配列
-		const lines = [
-			[
-				[140.02247036374916,35.857351475012855],
-				[140.02249263591895,35.85734696883766],
-				[140.0229420793391,35.85764094599428],
-				[140.02314815712387,35.85775912092171]
-			],
-			[
-				[140.02247036374916,35.857351475012855],
-				[140.02249263591895,35.85734696883766],
-				[140.0229420793391,35.85764094599428],
-				[140.02298434465897,35.857605347669946],
-				[140.02307848872718,35.85759777135079],
-				[140.02326252210872,35.857550232721074],
-				[140.0232989863063,35.8576449377277]
-			],
-			// 必要なだけ追加
-		];
-
-		const colors = [
-			'#b3b3ff', '#ffb84d', '#4db3ff', '#4dffe1', '#4dff4d', '#ffe14d', '#ff85ff'
-		];
-
-		// 既存の線をすべて削除
-		lines.forEach((_, idx) => {
-			const id = `custom-line-${idx}`;
-			if (map.getLayer(id)) map.removeLayer(id);
-			if (map.getSource(id)) map.removeSource(id);
-			const popupId = `custom-line-popup-${idx}`;
-			if (map._customLinePopups && map._customLinePopups[popupId]) {
-				map._customLinePopups[popupId].remove();
-				delete map._customLinePopups[popupId];
-			}
-		});
-
-		if (!map._customLinePopups) map._customLinePopups = {};
-
-		// 各線を追加
-		lines.forEach((coords, idx) => {
-			const id = `custom-line-${idx}`;
-			map.addSource(id, {
-				'type': 'geojson',
-				'data': {
-					'type': 'Feature',
-					'geometry': {
-						'type': 'LineString',
-						'coordinates': coords
-					}
-				}
-			});
-			map.addLayer({
-				'id': id,
-				'type': 'line',
-				'source': id,
-				'layout': {
-					'line-join': 'round',
-					'line-cap': 'round'
-				},
-				'paint': {
-					'line-color': colors[idx % colors.length],
-					'line-width': 5
-				}
-			});
-
-			// 距離計算
-			const distanceMeters = calcLineLength(coords);
-			const walkMin = Math.round(distanceMeters / 80); // 徒歩80m/分で計算
-			const walkText = `徒歩約${walkMin}分 (${distanceMeters < 1000 ? distanceMeters.toFixed(0) + 'm' : (distanceMeters/1000).toFixed(2) + 'km'})`;
-
-			// 線の中間点を計算
-			const midCoord = getLineMidpoint(coords);
-
-			// ポップアップ生成
-			const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false })
-				.setLngLat(midCoord)
-				.setHTML(`<div style="font-size:14px;font-weight:bold;">${walkText}</div>`)
-				.addTo(map);
-
-			// 管理しておく（再描画時に消すため）
-			map._customLinePopups[`custom-line-popup-${idx}`] = popup;
-		});
 	}
 
 	// 2点間の距離（m）を計算（Haversine式）
@@ -298,12 +206,10 @@ function init() {
 	const mapTools = document.getElementById('map-tools');
 	if (toolsToggle && mapTools) {
 		toolsToggle.addEventListener('click', () => {
-			const isVisible = mapTools.classList.contains('visible');
 			mapTools.classList.toggle('visible');
 		});
 	}
 
-	// ルート線データ
 	const lines = [
 		[
 			[140.02247036374916,35.857351475012855],
@@ -319,8 +225,9 @@ function init() {
 			[140.02307848872718,35.85759777135079],
 			[140.02326252210872,35.857550232721074],
 			[140.0232989863063,35.8576449377277]
-		]
-		// 必要に応じて追加
+		],
+		null, // [2] 現在地→てんと棟（API取得後に座標配列を格納）
+		null  // [3] 現在地→つばさ棟（API取得後に座標配列を格納）
 	];
 	const colors = [
 		'#b3b3ff', '#ffb84d', '#4db3ff', '#4dffe1', '#4dff4d', '#ffe14d', '#ff85ff'
@@ -341,7 +248,43 @@ function init() {
 	}
 
 	// 指定した線のみ表示
-	function showCustomLine(idx) {
+	async function showCustomLine(idx) {
+		// 現在地ルートの場合はAPIで道路ルートを取得
+		if (idx === 2 || idx === 3) {
+			if (map._currentLocationMarker && map._currentLocationMarker.getLngLat) {
+				const cur = map._currentLocationMarker.getLngLat();
+				const start = [cur.lng, cur.lat];
+				const goal = idx === 2
+					? [140.02247036374916,35.857351475012855] // てんと棟
+					: [140.0232989863063,35.8576449377277];   // つばさ棟
+
+				// OSRM APIで道路ルート取得
+				const url = `https://router.project-osrm.org/route/v1/foot/${start[0]},${start[1]};${goal[0]},${goal[1]}?overview=full&geometries=geojson`;
+				try {
+					const resp = await fetch(url);
+					const data = await resp.json();
+					if (data.routes && data.routes.length > 0) {
+						const coords = data.routes[0].geometry.coordinates;
+						lines[idx] = coords;
+					} else {
+						alert('ルートが見つかりませんでした');
+						const switchEl = document.getElementById(`route-switch-${idx}`);
+						if (switchEl) switchEl.checked = false;
+						return;
+					}
+				} catch (e) {
+					alert('ルート取得に失敗しました');
+					const switchEl = document.getElementById(`route-switch-${idx}`);
+					if (switchEl) switchEl.checked = false;
+					return;
+				}
+			} else {
+				alert('現在地が取得できません');
+				const switchEl = document.getElementById(`route-switch-${idx}`);
+				if (switchEl) switchEl.checked = false;
+				return;
+			}
+		}
 		const coords = lines[idx];
 		const id = `custom-line-${idx}`;
 		const color = colors[idx % colors.length];
@@ -430,24 +373,31 @@ function init() {
 		}
 	});
 
+	// 現在地が変わったら現在地ルートを再描画
+	async function redrawCurrentLocationRoutes() {
+		for (const idx of [2, 3]) {
+			const switchEl = document.getElementById(`route-switch-${idx}`);
+			if (switchEl && switchEl.checked) {
+				await showCustomLine(idx);
+			}
+		}
+	}
+
 }
 
 // 現在地を取得してcp_blue2.pngで表示（ライブ追従対応）
 function showCurrentLocation() {
 	if (!navigator.geolocation) return;
 
-	// 既存のwatcherがあれば停止
 	if (map._currentLocationWatcherId) {
 		navigator.geolocation.clearWatch(map._currentLocationWatcherId);
 		map._currentLocationWatcherId = null;
 	}
 
-	// 位置情報を監視
 	map._currentLocationWatcherId = navigator.geolocation.watchPosition(function(pos) {
 		const lng = pos.coords.longitude;
 		const lat = pos.coords.latitude;
 
-		// 既存の現在地マーカーを削除
 		if (map._currentLocationMarker) {
 			map._currentLocationMarker.remove();
 		}
@@ -465,6 +415,11 @@ function showCurrentLocation() {
 			.addTo(map);
 
 		map._currentLocationMarker = marker;
+
+		// 現在地ルートがONなら再描画
+		if (typeof redrawCurrentLocationRoutes === 'function') {
+			redrawCurrentLocationRoutes();
+		}
 	}, function(error) {
 		// エラー時は何もしない
 	}, {
