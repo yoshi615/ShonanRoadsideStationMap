@@ -137,6 +137,7 @@ function init() {
 					});
 					// 線は最初は表示しない
 					// drawCustomLines(); ← 削除
+					showCurrentLocation(); // 位置情報取得＆表示
 				}, 1000);
 			});
 		} else {
@@ -149,6 +150,7 @@ function init() {
 				pitch: 60 // ← ここでも傾きを加える
 			});
 			// drawCustomLines(); ← 削除
+			showCurrentLocation(); // 位置情報取得＆表示
 		}
 
 		// Restore previous view if preserving position
@@ -428,4 +430,32 @@ function init() {
 		}
 	});
 
+}
+
+// 現在地を取得してcp_blue2.pngで表示
+function showCurrentLocation() {
+	if (!navigator.geolocation) return;
+	navigator.geolocation.getCurrentPosition(function(pos) {
+		const lng = pos.coords.longitude;
+		const lat = pos.coords.latitude;
+
+		// 既存の現在地マーカーを削除
+		if (map._currentLocationMarker) {
+			map._currentLocationMarker.remove();
+		}
+
+		const el = document.createElement('div');
+		el.style.backgroundImage = 'url(images/cp_blue2.png)';
+		el.style.width = '40px';
+		el.style.height = '40px';
+		el.style.backgroundSize = 'contain';
+		el.style.backgroundRepeat = 'no-repeat';
+		el.style.borderRadius = '50%';
+
+		const marker = new maplibregl.Marker({ element: el })
+			.setLngLat([lng, lat])
+			.addTo(map);
+
+		map._currentLocationMarker = marker;
+	});
 }
