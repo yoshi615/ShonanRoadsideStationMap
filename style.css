@@ -470,3 +470,16 @@
         line-height: 1.7;
     }
 }
+
+.maplibregl-popup.guide-popup {
+	z-index: 20007;
+    border-radius: 100%;
+	pointer-events: auto; /* 追加: ポップアップ内の要素がクリックできるように */
+}
+.maplibregl-popup.guide-popup .maplibregl-popup-content {
+	text-align: center;
+}
+.guide-popup .guide-popup-lines {
+	text-align: left;
+	display: inline-block;
+}

@@ -122,18 +122,7 @@ function init() {
 				pitch: 0 // ← 初期値は0、後でflyToで変更
 			});
 			map.on('style.load', () => {
-				setTimeout(() => {
-					map.flyTo({
-						center: [centerLon, centerLat],
-						zoom: 18,
-						speed: 0.8,
-						curve: 1.5,
-						essential: true,
-						pitch: 60 // ← ここで傾きを加える（例: 60度）
-					});
-					// 線は最初は表示しない
-					showCurrentLocation(); // 位置情報取得＆表示
-				}, 1000);
+				showGuidePopup(); // 操作ガイドを表示
 			});
 		} else {
 			map.flyTo({
@@ -462,4 +451,55 @@ function showCurrentLocation() {
 		maximumAge: 0,
 		timeout: 10000
 	});
+}
+
+// 操作ガイドポップアップを表示
+function showGuidePopup() {
+	const guideHtml = `
+		<div style="max-width:320px;">
+			<b>つかいかた</b><br>
+			<span class="guide-popup-lines">
+				・地図をドラッグして移動できます<br>
+				・マウスホイールやピンチで拡大縮小<br>
+				・ルート表示ボタンで経路を表示<br>
+			</span>
+			<button id="close-guide-popup" style="margin-top:16px;padding:8px 24px;border-radius:6px;background:#4de7ff;color:#222;font-weight:bold;border:none;cursor:pointer;">閉じる</button>
+		</div>
+	`;
+	const popup = new maplibregl.Popup({
+		closeButton: false,
+		closeOnClick: false,
+		className: 'guide-popup'
+	})
+		.setLngLat(map.getCenter())
+		.setHTML(guideHtml)
+		.addTo(map);
+
+	// 閉じるボタンのイベント
+	setTimeout(() => {
+		const btn = document.getElementById('close-guide-popup');
+		if (btn) {
+			btn.onclick = () => {
+				popup.remove();
+				const ov = document.getElementById('guide-popup-overlay');
+				if (ov) ov.remove();
+				startInitialFlyTo();
+			};
+		}
+	}, 0);
+}
+
+// ポップアップ閉じた後にzoomを開始
+function startInitialFlyTo() {
+	let centerLat = 35.85767560509979;
+	let centerLon = 140.02295862179918;
+	map.flyTo({
+		center: [centerLon, centerLat],
+		zoom: 18,
+		speed: 0.8,
+		curve: 1.5,
+		essential: true,
+		pitch: 60
+	});
+	showCurrentLocation();
 }
