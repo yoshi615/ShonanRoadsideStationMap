@@ -266,6 +266,16 @@ function init() {
 					if (data.routes && data.routes.length > 0) {
 						const coords = data.routes[0].geometry.coordinates;
 						lines[idx] = coords;
+
+						// 両端点が収まるようにfitBounds
+						const bounds = new maplibregl.LngLatBounds();
+						bounds.extend(start);
+						bounds.extend(goal);
+						map.fitBounds(bounds, {
+							padding: 80,
+							maxZoom: 18,
+							duration: 800
+						});
 					} else {
 						alert('ルートが見つかりませんでした');
 						const switchEl = document.getElementById(`route-switch-${idx}`);
@@ -346,6 +356,31 @@ function init() {
 			map._customLinePopups[popupId].remove();
 			delete map._customLinePopups[popupId];
 		}
+		// 現在地ルートの両方がオフならズーム・中心をリセット
+		if (idx === 2 || idx === 3) {
+			const sw2 = document.getElementById('route-switch-2');
+			const sw3 = document.getElementById('route-switch-3');
+			if (sw2 && sw3 && !sw2.checked && !sw3.checked) {
+				resetMapView();
+			}
+		}
+	}
+
+	// 地図のズーム・中心を初期状態に戻す
+	function resetMapView() {
+		// 初期中心座標（データがあればそれを利用）
+		let centerLat = 35.85767560509979;
+		let centerLon = 140.02295862179918;
+		let zoom = 18;
+		let pitch = 60;
+		map.flyTo({
+			center: [centerLon, centerLat],
+			zoom: zoom,
+			speed: 0.8,
+			curve: 1.5,
+			essential: true,
+			pitch: pitch
+		});
 	}
 
 	// ルート表示ボタンのイベント
