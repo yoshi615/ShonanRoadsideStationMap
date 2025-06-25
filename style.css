@@ -221,10 +221,10 @@
         display: none;
     }
 
-    /* SNSボタン配置を縦並びに */
+    /* SNSボタン配置を右上縦並びに（左→右へ変更） */
     #btn-x-wrapper, #btn-instagram-wrapper, #btn-home-wrapper, #btn-facebook-wrapper {
         position: absolute;
-        left: 8px;
+        right: 8px; /* left→rightに変更 */
         z-index: 10001;
         width: 44px;
         height: 44px;
@@ -267,11 +267,12 @@
         transform: translate(-50%, -50%);
     }
 
-    /* ルート表示ボタン */
+    /* ルート表示ボタンを左上に（right→leftへ変更） */
     #show-routes-btn {
         position: absolute;
         top: 12px;
-        right: 12px;
+        left: 12px; /* right→leftに変更 */
+        right: auto;
         z-index: 10002;
         background-color: #4de7ff;
         color: #333;
@@ -289,14 +290,14 @@
         transform: scale(1.05);
     }
 
-    /* ルートトグルパネル */
+    /* ルートトグルパネルを左寄せに（right→leftへ変更） */
     #routes-toggle-panel {
         min-width: 150px;
         max-width: 90vw;
         position: absolute;
         top: 60px;
-        right: 12px;
-        left: auto;
+        left: 12px; /* right→leftに変更 */
+        right: auto;
         z-index: 10003;
         background: #fff;
         padding: 14px 12px 10px 12px;
