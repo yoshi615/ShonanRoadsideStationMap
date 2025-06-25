@@ -222,20 +222,6 @@ function init() {
 		'#b3b3ff', '#ffb84d', '#4db3ff', '#4dffe1', '#4dff4d', '#ffe14d', '#ff85ff'
 	];
 
-	// 線とポップアップを全て非表示にする関数
-	function hideCustomLines() {
-		lines.forEach((_, idx) => {
-			const id = `custom-line-${idx}`;
-			if (map.getLayer(id)) map.removeLayer(id);
-			if (map.getSource(id)) map.removeSource(id);
-			const popupId = `custom-line-popup-${idx}`;
-			if (map._customLinePopups && map._customLinePopups[popupId]) {
-				map._customLinePopups[popupId].remove();
-				delete map._customLinePopups[popupId];
-			}
-		});
-	}
-
 	// 指定した線のみ表示
 	async function showCustomLine(idx) {
 		// 現在地ルートの場合はAPIで道路ルートを取得
@@ -256,10 +242,9 @@ function init() {
 						const coords = data.routes[0].geometry.coordinates;
 						lines[idx] = coords;
 
-						// 両端点が収まるようにfitBounds
+						// 経路全体が画面に入るようにfitBounds
 						const bounds = new maplibregl.LngLatBounds();
-						bounds.extend(start);
-						bounds.extend(goal);
+						coords.forEach(coord => bounds.extend(coord));
 						map.fitBounds(bounds, {
 							padding: 80,
 							maxZoom: 18,
@@ -323,8 +308,15 @@ function init() {
 		});
 
 		const distanceMeters = calcLineLength(coords);
-		const walkMin = Math.round(distanceMeters / 80);
-		const walkText = `徒歩約${walkMin}分 (${distanceMeters < 1000 ? distanceMeters.toFixed(0) + 'm' : (distanceMeters/1000).toFixed(2) + 'km'})`;
+		let walkText;
+		if (distanceMeters > 5000) {
+			// 車の場合: 平均時速30km/h（=500m/分）で計算
+			const carMin = Math.round(distanceMeters / 500);
+			walkText = `車で約${carMin}分 (${distanceMeters < 1000 ? distanceMeters.toFixed(0) + 'm' : (distanceMeters/1000).toFixed(2) + 'km'})`;
+		} else {
+			const walkMin = Math.round(distanceMeters / 80);
+			walkText = `徒歩約${walkMin}分 (${distanceMeters < 1000 ? distanceMeters.toFixed(0) + 'm' : (distanceMeters/1000).toFixed(2) + 'km'})`;
+		}
 		const midCoord = getLineMidpoint(coords);
 
 		const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false })
@@ -376,9 +368,24 @@ function init() {
 	const showRoutesBtn = document.getElementById('show-routes-btn');
 	const routesTogglePanel = document.getElementById('routes-toggle-panel');
 	if (showRoutesBtn && routesTogglePanel) {
+		// 初期状態
+		routesTogglePanel.classList.remove('show');
+		routesTogglePanel.style.display = ""; // display:noneは使わない
+
 		showRoutesBtn.addEventListener('click', () => {
-			const isVisible = routesTogglePanel.style.display === "block";
-			routesTogglePanel.style.display = isVisible ? "none" : "block";
+			const isVisible = routesTogglePanel.classList.contains('show');
+			if (isVisible) {
+				routesTogglePanel.classList.remove('show');
+			} else {
+				// パネルの位置をボタンの下に合わせる（PC/スマホ両対応）
+				const btnRect = showRoutesBtn.getBoundingClientRect();
+				const panel = routesTogglePanel;
+				const scrollY = window.scrollY || document.documentElement.scrollTop;
+				const scrollX = window.scrollX || document.documentElement.scrollLeft;
+				panel.style.top = (btnRect.bottom + scrollY + 8) + "px";
+				panel.style.left = (btnRect.left + scrollX) + "px";
+				panel.classList.add('show');
+			}
 		});
 	}
 
@@ -456,13 +463,16 @@ function showCurrentLocation() {
 // 操作ガイドポップアップを表示
 function showGuidePopup() {
 	const guideHtml = `
-		<div style="max-width:320px;">
+		<div style="width:230px;">
 			<b>つかいかた</b><br>
 			<span class="guide-popup-lines">
 				・地図をドラッグして移動できます<br>
 				・マウスホイールやピンチで拡大縮小<br>
 				・ルート表示ボタンで経路を表示<br>
+				・下記のような青いマーカーが現在地です<br>
 			</span>
+			<img src ="images/arrow.png" style="width:50px;height:50px;position: absolute;left:45px;top:117px;"><br>
+			<img src="images/cp_blue2.png" style="width:40px;height:40px;margin:8px 0;"><br>
 			<button id="close-guide-popup" style="margin-top:16px;padding:8px 24px;border-radius:6px;background:#4de7ff;color:#222;font-weight:bold;border:none;cursor:pointer;">閉じる</button>
 		</div>
 	`;
