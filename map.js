@@ -15,18 +15,6 @@ function init() {
 		renderShonanInfo();
 	}
 
-	// 言語切り替えトグルが存在する場合のみイベントを設定
-	const langToggle = document.getElementById('languageToggle');
-	if (langToggle) {
-		langToggle.addEventListener('change', function(e) {
-			const newLanguage = e.target.checked ? 'english' : 'japanese';
-			document.querySelectorAll('[data-ja], [data-en]').forEach(element => {
-				element.textContent = element.getAttribute(newLanguage === 'english' ? 'data-en' : 'data-ja');
-			});
-			setLanguage(newLanguage);
-		});
-	}
-
 	// 「道の駅しょうなん」の情報のみを表示
 	function renderShonanInfo() {
 		// #info要素がないので何もしない
@@ -47,19 +35,15 @@ function init() {
 			XLink
 		] = shonanRow;
 
-		// X(Twitter)ボタン
 		const btnX = document.getElementById('btn-x');
 		btnX.onclick = () => { if (XLink) window.open(XLink, '_blank'); };
 
-		// Instagramボタン
 		const btnInstagram = document.getElementById('btn-instagram');
 		btnInstagram.onclick = () => { if (InstagramLink) window.open(InstagramLink, '_blank'); };
 
-		// ホームページボタン
 		const btnHome = document.getElementById('btn-home');
 		btnHome.onclick = () => { if (SiteLink) window.open(SiteLink, '_blank'); };
 
-		// Facebookボタン
 		const btnFacebook = document.getElementById('btn-facebook');
 		btnFacebook.onclick = () => { if (FacebookLink) window.open(FacebookLink, '_blank'); };
 	}
@@ -191,29 +175,29 @@ function init() {
 	setupSNSButtons();
 
 	// Add tools panel toggle functionality
-	const toolsToggle = document.getElementById('tools-toggle');
-	const mapTools = document.getElementById('map-tools');
-	if (toolsToggle && mapTools) {
-		toolsToggle.addEventListener('click', () => {
-			mapTools.classList.toggle('visible');
-		});
-	}
+	// const toolsToggle = document.getElementById('tools-toggle');
+	// const mapTools = document.getElementById('map-tools');
+	// if (toolsToggle && mapTools) {
+	// 	toolsToggle.addEventListener('click', () => {
+	// 		mapTools.classList.toggle('visible');
+	// 	});
+	// }
 
 	const lines = [
 		[
-			[140.02247036374916,35.857351475012855],
+			[140.02247036374916,35.857351475012855], //start point
 			[140.02249263591895,35.85734696883766],
 			[140.0229420793391,35.85764094599428],
-			[140.02314815712387,35.85775912092171]
+			[140.02314815712387,35.85775912092171] //goal point
 		],
 		[
-			[140.02247036374916,35.857351475012855],
+			[140.02247036374916,35.857351475012855], //start point
 			[140.02249263591895,35.85734696883766],
 			[140.0229420793391,35.85764094599428],
 			[140.02298434465897,35.857605347669946],
 			[140.02307848872718,35.85759777135079],
 			[140.02326252210872,35.857550232721074],
-			[140.0232989863063,35.8576449377277]
+			[140.0232989863063,35.8576449377277] //goal point
 		],
 		null, // [2] 現在地→てんと棟（API取得後に座標配列を格納）
 		null  // [3] 現在地→つばさ棟（API取得後に座標配列を格納）
