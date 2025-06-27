@@ -1,501 +1,251 @@
-/* PC用レイアウト */
-@media (min-width: 768px) {
-    body {
-        margin: 0;
-        display: flex;
-        flex-direction: row;
-        font-family: sans-serif;
-        overflow-y: hidden;
-    }
-    #right-panel {
-        width: 100%;
-        height: 100vh;
-        position: relative;
-        z-index: 1;
-    }
-    #map {
-        height: 100vh;
-        width: 100%;
-        position: absolute;
-        z-index: 1;
-    }
-    #map-style {
-        display: none;
-    }
-    .map-control {
-        display: block;
-        margin: 5px 0;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background: white;
-        font-size: 14px;
-        width: 200px;
-    }
-    select.map-control {
-        appearance: none;
-        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 8px center;
-        background-size: 16px;
-        padding-right: 30px;
-    }
-    button.map-control {
-        background-color: #296460;
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    button.map-control:hover {
-        background-color: #163900;
-    }
-    #language-control {
-        display: none;
-    }
-    button {
-        background-color: #296460;
-        color: white;
-        padding: 10px 20px;
-        margin: 5px;
-        cursor: pointer;
-        border: none;
-        border-radius: 4px;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        font-size: 16px;
-    }
-    button:hover {
-        background-color: #163900;
-        transform: scale(1.05);
-    }
-    .fade {
-        animation-name: fade;
-        animation-duration: 1.5s;
-    }
-    @keyframes fade { from {opacity: .4} to {opacity: 1} }
-
-    /* --- SNSボタン --- */
-    #btn-x-wrapper, #btn-instagram-wrapper, #btn-home-wrapper, #btn-facebook-wrapper {
-        position: absolute;
-        right: 1px;
-        z-index: 10001;
-        width: 54px;
-        height: 54px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #btn-x-wrapper { top: 7px; }
-    #btn-instagram-wrapper { top: 57px; }
-    #btn-home-wrapper { top: 109px; }
-    #btn-facebook-wrapper { top: 164px; }
-
-    #btn-x, #btn-instagram, #btn-home, #btn-facebook {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        outline: none;
-        transition: transform 0.2s, filter 0.2s;
-        width: 54px;
-        height: 54px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #btn-x:hover, #btn-instagram:hover, #btn-home:hover, #btn-facebook:hover {
-        transform: scale(1.15);
-    }
-    #btn-x img,
-    #btn-instagram img,
-    #btn-home img,
-    #btn-facebook img {
-        width: 46px;
-        height: 46px;
-        display: block;
-        margin: auto;
-        position: relative;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    /* ルート表示ボタン */
-    #show-routes-btn {
-        position: absolute;
-        top: 8px;
-        left: 4px;
-        z-index: 10002;
-        background-color: #4de7ff;
-        color: #333;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 24px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: background 0.2s, transform 0.2s;
-    }
-    #show-routes-btn:hover {
-        background-color: #a1fff9;
-        transform: scale(1.07);
-    }
-
-    #routes-toggle-panel {
-        min-width: 180px;
-        /* 他はインラインstyleでOK */
-    }
-    .switch-route {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        cursor: pointer;
-        user-select: none;
-    }
-    .switch-route input[type="checkbox"] {
-        display: none;
-    }
-    .switch-route .slider {
-        width: 44px;
-        height: 24px;
-        background: #ccc;
-        border-radius: 24px;
-        position: relative;
-        transition: background 0.2s;
-        margin-right: 12px;
-    }
-    .switch-route .slider:before {
-        content: "";
-        position: absolute;
-        left: 2px;
-        top: 2px;
-        width: 20px;
-        height: 20px;
-        background: #fff;
-        border-radius: 50%;
-        transition: transform 0.2s;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .switch-route input[type="checkbox"]:checked + .slider {
-        background: #4de7ff;
-    }
-    .switch-route input[type="checkbox"]:checked + .slider:before {
-        transform: translateX(20px);
-    }
-    .route-label {
-        font-size: 15px;
-        color: #333;
-        margin-left: 4px;
-    }
+:root {
+	--primary-color: #4de7ff;
+	--primary-hover: #a1fff9;
+	--dark-color: #296460;
+	--dark-hover: #163900;
+	--text-color: #333;
+	--border-color: #ddd;
+	--shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
-/* =========================
-    スマートフォン用レイアウト
-   ========================= */
-@media (max-width: 767px) {
-    body {
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        height: 100vh;
-        font-family: sans-serif;
-    }
-    #right-panel {
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-        flex-shrink: 0;
-        background: #fff;
-    }
-    #map {
-        width: 100vw;
-        height: 100vh;
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 1;
-    }
-    #map-style {
-        display: none;
-    }
-
-    /* SNSボタン配置を右上縦並びに（左→右へ変更） */
-    #btn-x-wrapper, #btn-instagram-wrapper, #btn-home-wrapper, #btn-facebook-wrapper {
-        position: absolute;
-        right: 8px; /* left→rightに変更 */
-        z-index: 10001;
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #btn-x-wrapper { top: 8px; }
-    #btn-instagram-wrapper { top: 60px; }
-    #btn-home-wrapper { top: 112px; }
-    #btn-facebook-wrapper { top: 164px; }
-
-    #btn-x, #btn-instagram, #btn-home, #btn-facebook {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        outline: none;
-        transition: transform 0.2s, filter 0.2s;
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #btn-x:hover, #btn-instagram:hover, #btn-home:hover, #btn-facebook:hover {
-        transform: scale(1.12);
-    }
-    #btn-x img,
-    #btn-instagram img,
-    #btn-home img,
-    #btn-facebook img {
-        width: 38px;
-        height: 38px;
-        display: block;
-        margin: auto;
-        position: relative;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    /* ルート表示ボタンを左上に（right→leftへ変更） */
-    #show-routes-btn {
-        position: absolute;
-        top: 12px;
-        left: 12px; /* right→leftに変更 */
-        right: auto;
-        z-index: 10002;
-        background-color: #4de7ff;
-        color: #333;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 18px;
-        font-size: 15px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: background 0.2s, transform 0.2s;
-    }
-    #show-routes-btn:hover {
-        background-color: #a1fff9;
-        transform: scale(1.05);
-    }
-
-    /* ルートトグルパネルを左寄せに（right→leftへ変更） */
-    #routes-toggle-panel {
-        min-width: 150px;
-        max-width: 90vw;
-        position: absolute;
-        top: 60px;
-        left: 12px; /* right→leftに変更 */
-        right: auto;
-        z-index: 10003;
-        background: #fff;
-        padding: 14px 12px 10px 12px;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-        font-size: 15px;
-    }
-    .switch-route {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        cursor: pointer;
-        user-select: none;
-    }
-    .switch-route input[type="checkbox"] {
-        display: none;
-    }
-    .switch-route .slider {
-        width: 38px;
-        height: 20px;
-        background: #ccc;
-        border-radius: 20px;
-        position: relative;
-        transition: background 0.2s;
-        margin-right: 10px;
-    }
-    .switch-route .slider:before {
-        content: "";
-        position: absolute;
-        left: 2px;
-        top: 2px;
-        width: 16px;
-        height: 16px;
-        background: #fff;
-        border-radius: 50%;
-        transition: transform 0.2s;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .switch-route input[type="checkbox"]:checked + .slider {
-        background: #4de7ff;
-    }
-    .switch-route input[type="checkbox"]:checked + .slider:before {
-        transform: translateX(18px);
-    }
-    .route-label {
-        font-size: 14px;
-        color: #333;
-        margin-left: 2px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 70vw;
-    }
-
-    /* 汎用コントロール・ラベル・チェックボックス等 */
-    .control-group { margin-bottom: 10px; }
-    .control-label {
-        display: block;
-        margin-bottom: 4px;
-        color: #333;
-        font-size: 13px;
-        font-weight: bold
-    }
-    .checkbox-group {
-        background: white;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-    .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 4px 0;
-        cursor: pointer;
-        user-select: none;
-    }
-    .checkbox-label input[type="checkbox"] {
-        appearance: none;
-        -webkit-appearance: none;
-        width: 16px;
-        height: 16px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        cursor: pointer;
-        position: relative;
-        transition: background-color 0.3s;
-    }
-    .checkbox-label input[type="checkbox"]:checked {
-        background-color: #296460;
-        border-color: #1a3f00;
-    }
-    .checkbox-label input[type="checkbox"]:checked::after {
-        content: "✓";
-        position: absolute;
-        color: white;
-        font-size: 12px;
-        left: 2px;
-        top: 0px;
-    }
-    .checkbox-text { font-size: 13px; color: #333; }
-    .control-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4px;
-    }
-    .control-actions {
-        display: flex;
-        gap: 4px;
-        align-items: center;
-        font-size: 11px;
-    }
-    .control-link {
-        color: #296460;
-        text-decoration: none;
-        transition: color 0.3s;
-    }
-    .control-link:hover {
-        color: #163900;
-        text-decoration: underline;
-    }
-    .control-separator { color: #ddd; }
-    .tools-toggle {
-        position: absolute;
-        right: 10px;
-        z-index: 10000;
-        background: none;
-        color: inherit;
-        border: none;
-        padding: 0;
-        border-radius: 0;
-        cursor: pointer;
-        font-size: 10px;
-        box-shadow: none;
-        transition: none;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .tools-toggle:hover { background: none; }
-    .control-row {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin-top: 8px;
-    }
-    .switch-lang {
-        width: 38px;
-        height: 20px;
-        display: inline-block;
-        position: relative;
-        margin: 4px;
-    }
-    .switch-lang .slider {
-        width: 100%;
-        height: 100%;
-    }
-    .switch-lang .slider:before {
-        width: 16px;
-        height: 16px;
-        left: 0px;
-        top: 0px;
-    }
-    #info .info-link {
-        display: inline-block;
-        margin-bottom: 8px;
-        line-height: 1.7;
-    }
+* {
+	box-sizing: border-box;
 }
 
-.maplibregl-popup.guide-popup {
-	z-index: 20007;
-    border-radius: 100%;
-	pointer-events: auto; /* 追加: ポップアップ内の要素がクリックできるように */
-}
-.maplibregl-popup.guide-popup .maplibregl-popup-content {
-	text-align: center;
-}
-.guide-popup .guide-popup-lines {
-	text-align: left;
-	display: inline-block;
-    position: relative;
-    left:-6px;
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	overflow: hidden;
+	height: 100vh;
 }
 
-/* ルートトグルパネルのアニメーション */
-#routes-toggle-panel {
-	transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
+/* メインコンテナ */
+.map-container {
+	width: 100vw;
+	height: 100vh;
+	position: relative;
+}
+
+#map {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+
+/* ソーシャルナビゲーション */
+.social-nav {
+	position: absolute;
+	right: 8px;
+	top: 8px;
+	z-index: 1000;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.social-btn {
+	width: 44px;
+	height: 44px;
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	transition: transform 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.social-btn:hover {
+	transform: scale(1.12);
+}
+
+.social-btn img {
+	width: 38px;
+	height: 38px;
+}
+
+/* ルートコントロール */
+.route-controls {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	z-index: 1000;
+}
+
+.route-toggle-btn {
+	background-color: var(--primary-color);
+	color: var(--text-color);
+	border: none;
+	border-radius: 8px;
+	padding: 10px 18px;
+	font-size: 15px;
+	font-weight: bold;
+	cursor: pointer;
+	box-shadow: var(--shadow);
+	transition: background-color 0.2s, transform 0.2s;
+}
+
+.route-toggle-btn:hover {
+	background-color: var(--primary-hover);
+	transform: scale(1.05);
+}
+
+.routes-panel {
+	position: absolute;
+	top: 52px;
+	left: 0;
+	min-width: 180px;
+	max-width: 90vw;
+	background: white;
+	padding: 16px;
+	border-radius: 10px;
+	box-shadow: var(--shadow);
 	opacity: 0;
 	transform: translateY(-20px) scale(0.95);
 	pointer-events: none;
+	transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
 }
 
-#routes-toggle-panel.show {
+.routes-panel.show {
 	opacity: 1;
 	transform: translateY(0) scale(1);
 	pointer-events: auto;
+}
+
+.routes-panel h3 {
+	margin: 0 0 12px 0;
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--text-color);
+}
+
+.route-option {
+	display: flex;
+	align-items: center;
+	margin-bottom: 10px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.route-option:last-child {
+	margin-bottom: 0;
+}
+
+.route-option input[type="checkbox"] {
+	display: none;
+}
+
+.route-option .slider {
+	width: 38px;
+	height: 20px;
+	background: #ccc;
+	border-radius: 20px;
+	position: relative;
+	transition: background-color 0.2s;
+	margin-right: 10px;
+	flex-shrink: 0;
+}
+
+.route-option .slider:before {
+	content: "";
+	position: absolute;
+	left: 2px;
+	top: 2px;
+	width: 16px;
+	height: 16px;
+	background: white;
+	border-radius: 50%;
+	transition: transform 0.2s;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.route-option input[type="checkbox"]:checked + .slider {
+	background-color: var(--primary-color);
+}
+
+.route-option input[type="checkbox"]:checked + .slider:before {
+	transform: translateX(18px);
+}
+
+.route-option .label {
+	font-size: 14px;
+	color: var(--text-color);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* ガイドポップアップ */
+.maplibregl-popup.guide-popup {
+	z-index: 2000;
+}
+
+.maplibregl-popup.guide-popup .maplibregl-popup-content {
+	text-align: center;
+	border-radius: 12px;
+}
+
+.guide-popup .guide-popup-lines {
+	text-align: left;
+	display: inline-block;
+	position: relative;
+	left: -6px;
+}
+
+/* デスクトップ調整 */
+@media (min-width: 768px) {
+	.social-nav {
+		right: 1px;
+		gap: 7px;
+	}
+	
+	.social-btn {
+		width: 54px;
+		height: 54px;
+	}
+	
+	.social-btn img {
+		width: 46px;
+		height: 46px;
+	}
+	
+	.social-btn:hover {
+		transform: scale(1.15);
+	}
+	
+	.route-toggle-btn {
+		padding: 12px 24px;
+		font-size: 16px;
+	}
+	
+	.route-toggle-btn:hover {
+		transform: scale(1.07);
+	}
+	
+	.routes-panel {
+		min-width: 200px;
+	}
+	
+	.route-option .slider {
+		width: 44px;
+		height: 24px;
+		margin-right: 12px;
+	}
+	
+	.route-option .slider:before {
+		width: 20px;
+		height: 20px;
+	}
+	
+	.route-option input[type="checkbox"]:checked + .slider:before {
+		transform: translateX(20px);
+	}
+	
+	.route-option .label {
+		font-size: 15px;
+	}
 }

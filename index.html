@@ -1,63 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>手賀沼3Dプロトタイピング</title>
 	<link rel="icon" href="images/QR.png" type="image/png">
-	<!-- MapLibre GL JS CSS -->
 	<link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet">
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<div id="right-panel">
-		<div id="btn-x-wrapper">
-			<button id="btn-x" title="X(Twitter)">
+	<main class="map-container">
+		<div id="map"></div>
+		
+		<!-- SNSボタン -->
+		<nav class="social-nav">
+			<button id="btn-x" class="social-btn" title="X(Twitter)">
 				<img src="images/X_logo.png" alt="X">
 			</button>
-		</div>
-		<div id="btn-instagram-wrapper">
-			<button id="btn-instagram" title="Instagram">
+			<button id="btn-instagram" class="social-btn" title="Instagram">
 				<img src="images/Instagram_logo.png" alt="Instagram">
 			</button>
-		</div>
-		<div id="btn-home-wrapper">
-			<button id="btn-home" title="ホームページ">
+			<button id="btn-home" class="social-btn" title="ホームページ">
 				<img src="images/home.png" alt="ホーム">
 			</button>
-		</div>
-		<div id="btn-facebook-wrapper">
-			<button id="btn-facebook" title="Facebook">
+			<button id="btn-facebook" class="social-btn" title="Facebook">
 				<img src="images/facebook_logo.png" alt="Facebook">
 			</button>
+		</nav>
+		
+		<!-- ルート表示コントロール -->
+		<div class="route-controls">
+			<button id="show-routes-btn" class="route-toggle-btn">ルートを表示</button>
+			<div id="routes-panel" class="routes-panel">
+				<h3>ルート表示</h3>
+				<label class="route-option">
+					<input type="checkbox" id="route-0">
+					<span class="slider"></span>
+					<span class="label">てんと棟 ⇄ 食堂</span>
+				</label>
+				<label class="route-option">
+					<input type="checkbox" id="route-1">
+					<span class="slider"></span>
+					<span class="label">てんと棟 ⇄ つばさ棟</span>
+				</label>
+				<label class="route-option">
+					<input type="checkbox" id="route-2">
+					<span class="slider"></span>
+					<span class="label">現在地 ⇄ てんと棟</span>
+				</label>
+				<label class="route-option">
+					<input type="checkbox" id="route-3">
+					<span class="slider"></span>
+					<span class="label">現在地 ⇄ つばさ棟</span>
+				</label>
+			</div>
 		</div>
-		<button id="show-routes-btn">ルートを表示</button>
-		<div id="routes-toggle-panel" style="display:none;position:absolute;top:64px;left:10px;z-index:10003;background:#fff;padding:18px 20px 12px 20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
-			<div style="font-weight:bold;margin-bottom:10px;">ルート表示</div>
-			<label class="switch-route">
-				<input type="checkbox" id="route-switch-0">
-				<span class="slider"></span>
-				<span class="route-label">てんと棟 <==> 食堂</span>
-			</label>
-			<label class="switch-route">
-				<input type="checkbox" id="route-switch-1">
-				<span class="slider"></span>
-				<span class="route-label">てんと棟 <==> つばさ棟</span>
-			</label>
-			<label class="switch-route">
-				<input type="checkbox" id="route-switch-2">
-				<span class="slider"></span>
-				<span class="route-label">現在地 <==> てんと棟</span>				
-			</label>
-			<label class="switch-route">
-				<input type="checkbox" id="route-switch-3">
-				<span class="slider"></span>
-				<span class="route-label">現在地 <==> つばさ棟</span>				
-			</label>
-			<!-- 必要に応じてルートを追加 -->
-		</div>
-		<div id="map"></div>
-	</div>
+	</main>
+	
 	<script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
 	<script src="map.js"></script>
 	<script src="getdata.js"></script>
