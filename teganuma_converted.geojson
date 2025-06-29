@@ -1,0 +1,19 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          140.02279181643652,
+          35.8572476511406,
+          -0.653
+        ]
+      },
+      "properties": {
+        "name": "立方体"
+      }
+    }
+  ]
+}

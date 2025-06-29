@@ -68,29 +68,29 @@ function initMap() {
 
 async function loadAreaData() {
 	try {
-		const response = await fetch('道の駅.geojson');
+		const response = await fetch('teganuma_converted.geojson');
 		if (!response.ok) throw new Error(`HTTP ${response.status}`);
 		
 		const geojsonData = await response.json();
 		if (!geojsonData?.type) throw new Error('Invalid GeoJSON');
 		
 		addAreaLayers(geojsonData);
-		console.log('道の駅.geojsonを正常に読み込みました');
+		console.log('teganuma_converted.geojsonを正常に読み込みました');
 	} catch (error) {
-		console.warn('道の駅.geojsonの読み込みをスキップしました:', error.message);
+		console.warn('teganuma_converted.geojsonの読み込みをスキップしました:', error.message);
 	}
 }
 
 function addAreaLayers(geojsonData) {
-	map.addSource('shonan-area', {
+	map.addSource('teganuma_converted', {
 		type: 'geojson',
 		data: geojsonData
 	});
 	
 	map.addLayer({
-		id: 'shonan-area-fill',
+		id: 'teganuma_converted-fill',
 		type: 'fill',
-		source: 'shonan-area',
+		source: 'teganuma_converted',
 		paint: {
 			'fill-color': '#4de7ff',
 			'fill-opacity': 0.3
@@ -98,9 +98,9 @@ function addAreaLayers(geojsonData) {
 	});
 	
 	map.addLayer({
-		id: 'shonan-area-line',
+		id: 'teganuma_converted-line',
 		type: 'line',
-		source: 'shonan-area',
+		source: 'teganuma_converted',
 		paint: {
 			'line-color': '#4de7ff',
 			'line-width': 2,
@@ -424,17 +424,10 @@ function addParkingLots() {
 				[140.02308, 35.85672], [140.02312, 35.85670], [140.02316, 35.85669],
 				[140.02321710418968, 35.856664792558526], [140.0233284158564, 35.85674033519591],
 				[140.0234310103444, 35.856639792820964], [140.0234886778473, 35.856685987983184],
-				[140.0236690564004, 35.85709196077594], [140.02352555822168, 35.85723598007687],
-				[140.02352287601283, 35.857240327825174], [140.02352354656506, 35.85724521904175],
-				[140.02351751159514, 35.8573283696773], [140.02340, 35.85720], [140.02330, 35.85715],
-				[140.02320, 35.85710], [140.02315, 35.85708], [140.02310, 35.85706],
-				[140.02307512454288, 35.85705226820829], [140.0230758772123, 35.85703274742992],
-				[140.02307361920327, 35.85702176698772], [140.0230788878892, 35.85699858605393],
-				[140.02308942526102, 35.856971744964626], [140.02309544661637, 35.856951004116034],
-				[140.02309770462458, 35.85694856401588], [140.02311125267408, 35.85692660311115],
-				[140.02302319035238, 35.85695222416607], [140.02301265297922, 35.85688695146025],
-				[140.0231022206398, 35.8568723108464], [140.0230984572927, 35.85685156997214],
-				[140.02307361920197, 35.85683753937764], [140.02305617165973, 35.856743052557476]
+				[140.0236690564004, 35.85709196077594], [140.0233879791333, 35.85731145510835],
+				[140.02321735688187, 35.85728768726051], [140.02312138186545, 35.857205580094956],
+				[140.0230680624119, 35.857085660266144], [140.02307072838457, 35.85699707072654],
+				[140.02305617165973, 35.856743052557476]
 			]]
 		},
 		{
