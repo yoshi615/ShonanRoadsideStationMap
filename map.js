@@ -241,9 +241,19 @@ function addRouteToMap(idx, coords) {
 	
 	// 距離表示ポップアップ
 	const distance = calculateDistance(coords);
-	const walkTime = Math.round(distance / 80);
 	const distanceText = distance < 1000 ? `${distance.toFixed(0)}m` : `${(distance/1000).toFixed(2)}km`;
-	const text = `徒歩約${walkTime}分 (${distanceText})`;
+	
+	let text;
+	if (distance > 5000) {
+		// 車の場合: 平均時速30km/h（=500m/分）で計算
+		const carMin = Math.round(distance / 500);
+		text = `車で約${carMin}分 (${distanceText})`;
+	} else {
+		// 徒歩と自転車の場合
+		const walkMin = Math.round(distance / 80);  // 平均時速4.8km/h（=80m/分）
+		const bikeMin = Math.round(distance / 250); // 平均時速15km/h（=250m/分）
+		text = `徒歩約${walkMin}分・自転車約${bikeMin}分 (${distanceText})`;
+	}
 	
 	const midpoint = getLineMidpoint(coords);
 	const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false })
@@ -454,12 +464,15 @@ function addParkingLots() {
 			id: 'p4-parking',
 			name: 'P4駐車場',
 			coordinates: [[
-				[140.02078277923582, 35.857680604304086], [140.02220, 35.85740], [140.02225, 35.85725],
-				[140.02220, 35.85710], [140.02215, 35.85695], [140.02210, 35.85680], [140.02195, 35.85672],
-				[140.02180, 35.85667], [140.02160, 35.85663], [140.02145, 35.85661], [140.02130, 35.85660],
-				[140.02110, 35.85661], [140.02090, 35.85662], [140.02075, 35.85663], [140.02070, 35.85670],
-				[140.02067, 35.85700], [140.02070, 35.85720], [140.02074, 35.85740], [140.02078, 35.85760],
-				[140.02078277923582, 35.857680604304086]
+				[140.02076970136977,35.85759140447969],
+				[140.02065134225222,35.85663574704727],
+				[140.02101311915393,35.856604977582506],
+				[140.02124537099203,35.85660135764468],
+				[140.02148432240244,35.85666832646754],
+				[140.02205825247853,35.856809503799035],
+				[140.02211408224733,35.85719140532485],
+				[140.02147315650174,35.85745022853573],
+				[140.0210756485027,35.85756787517369]
 			]]
 		}
 	];
